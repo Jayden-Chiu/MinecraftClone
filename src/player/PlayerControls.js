@@ -36,34 +36,28 @@ export class PlayerControls extends PointerLockControls {
         // w
         if (keys.includes(87)) {
             this.moveForward(CameraConstants.MOVEMENT_SPEED);
-            
         }
         // a
         if (keys.includes(65)) {
             this.moveRight(-1 * CameraConstants.MOVEMENT_SPEED);
-            
         }
         // s
         if (keys.includes(83)) {
             this.moveForward(-1 * CameraConstants.MOVEMENT_SPEED);
-            
         }
         // d
         if (keys.includes(68)) {
             this.moveRight(CameraConstants.MOVEMENT_SPEED);
-            
         }
 
         // space
         if (keys.includes(32)) {
             this.getObject().position.y += CameraConstants.MOVEMENT_SPEED;
-            
         }
 
         // shift
         if (keys.includes(16)) {
             this.getObject().position.y -= CameraConstants.MOVEMENT_SPEED;
-            
         }
     }
 }

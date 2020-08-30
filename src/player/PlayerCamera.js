@@ -4,38 +4,56 @@ import * as SceneConstants from "../constants/SceneConstants.js";
 import World from "../world/World.js";
 
 export class PlayerCamera extends THREE.PerspectiveCamera {
-    constructor() {
+    constructor(canvas, world) {
         super(CameraConstants.FOV, CameraConstants.ASPECT, CameraConstants.NEAR, CameraConstants.FAR);
-        this.position.set(CameraConstants.CAMERA_DEFAULT_X, CameraConstants.CAMERA_DEFAULT_Y,CameraConstants.CAMERA_DEFAULT_Z);
-        
+        this.position.set(
+            CameraConstants.CAMERA_DEFAULT_X,
+            CameraConstants.CAMERA_DEFAULT_Y,
+            CameraConstants.CAMERA_DEFAULT_Z
+        );
+
         this.cx = CameraConstants.CAMERA_DEFAULT_CHUNK_X;
         this.cz = CameraConstants.CAMERA_DEFAULT_CHUNK_Z;
+
+        const self = this;
+
+        this.canvas = canvas;
+        this.world = world;
+
+        window.addEventListener(
+            "mousedown",
+            (event) => {
+                event.preventDefault();
+                window.addEventListener("mouseup", self.placeVoxel(event, self.canvas));
+            },
+            { passive: false }
+        );
     }
 
-    getCameraChunkCoords(){
+    getCameraChunkCoords() {
         const x = this.position.x;
         const y = this.position.y;
         const z = this.position.z;
 
-        const cx = Math.floor(x/WorldConstants.CHUNK_SIZE);
-        const cy = Math.floor(y/WorldConstants.CHUNK_SIZE);
-        const cz = Math.floor(z/WorldConstants.CHUNK_SIZE);
+        const cx = Math.floor(x / WorldConstants.CHUNK_SIZE);
+        const cy = Math.floor(y / WorldConstants.CHUNK_SIZE);
+        const cz = Math.floor(z / WorldConstants.CHUNK_SIZE);
 
         this.cx = cx;
         this.cy = cy;
         this.cz = cz;
 
-        return [cx,cy,cz];
+        return [cx, cy, cz];
     }
 
-    setCameraChunkCoords(cx,cy,cz){
+    setCameraChunkCoords(cx, cy, cz) {
         this.cx = cx;
         this.cy = cy;
         this.cz = cz;
     }
 
-    getCameraRenderingAreaCoords(){
-        const {cx,cy,cz} = this;
+    getCameraRenderingAreaCoords() {
+        const { cx, cy, cz } = this;
 
         // update cameras current chunk
         const pbx = cx - CameraConstants.RENDER_DISTANCE;
@@ -47,12 +65,12 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
         const pbz = cz - CameraConstants.RENDER_DISTANCE;
         const pfz = cz + CameraConstants.RENDER_DISTANCE;
 
-        return [pbx,pfx,pby,pfy,pbz,pfz];
+        return [pbx, pfx, pby, pfy, pbz, pfz];
     }
 
-    updateFog(scene,world) {
+    updateFog(scene, world) {
         if (world.debug) return;
-        const voxel = world.getVoxel(this.position.x,this.position.y,this.position.z);
+        const voxel = world.getVoxel(this.position.x, this.position.y, this.position.z);
 
         if (voxel === WorldConstants.BLOCK_TYPES.WATER) {
             scene.fog = SceneConstants.WATER_FOG;
@@ -63,5 +81,110 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
             scene.remove(SceneConstants.WATER_AMBIENT);
             scene.add(SceneConstants.AMBIENT);
         }
+    }
+
+    placeVoxel(event, canvas) {
+        function getCanvasRelativePosition(event, canvas) {
+            const rect = canvas.getBoundingClientRect();
+            return {
+                x: ((event.clientX - rect.left) * canvas.width) / rect.width,
+                y: ((event.clientY - rect.top) * canvas.height) / rect.height,
+            };
+        }
+
+        const pos = getCanvasRelativePosition(event, canvas);
+        const x = (pos.x / canvas.width) * 2 - 1;
+        const y = (pos.y / canvas.height) * -2 + 1; // note we flip Y
+
+        const start = new THREE.Vector3();
+        const end = new THREE.Vector3();
+
+        start.setFromMatrixPosition(this.matrixWorld);
+        end.set(x, y, 1).unproject(this);
+
+        const intersection = this.intersectRay(start, end);
+
+        if (intersection) {
+            console.log(intersection);
+        }
+    }
+
+    intersectRay(start, end) {
+        let dx = end.x - start.x;
+        let dy = end.y - start.y;
+        let dz = end.z - start.z;
+        const len = Math.sqrt(dx * dx + dy * dy + dz * dz);
+
+        dx /= len;
+        dy /= len;
+        dz /= len;
+
+        let t = 0.0;
+        let ix = Math.floor(start.x);
+        let iy = Math.floor(start.y);
+        let iz = Math.floor(start.z);
+
+        const stepX = dx > 0 ? 1 : -1;
+        const stepY = dy > 0 ? 1 : -1;
+        const stepZ = dz > 0 ? 1 : -1;
+
+        const txDelta = Math.abs(1 / dx);
+        const tyDelta = Math.abs(1 / dy);
+        const tzDelta = Math.abs(1 / dz);
+
+        const xDist = stepX > 0 ? ix + 1 - start.x : start.x - ix;
+        const yDist = stepY > 0 ? iy + 1 - start.y : start.y - iy;
+        const zDist = stepZ > 0 ? iz + 1 - start.z : start.z - iz;
+
+        // location of nearest voxel boundary, in units of t
+        let txMax = txDelta < Infinity ? txDelta * xDist : Infinity;
+        let tyMax = tyDelta < Infinity ? tyDelta * yDist : Infinity;
+        let tzMax = tzDelta < Infinity ? tzDelta * zDist : Infinity;
+
+        let steppedIndex = -1;
+
+        // main loop along raycast vector
+        while (t <= len) {
+            const voxel = this.world.getVoxel(ix, iy, iz);
+            if (voxel) {
+                return {
+                    position: [start.x + t * dx, start.y + t * dy, start.z + t * dz],
+                    normal: [
+                        steppedIndex === 0 ? -stepX : 0,
+                        steppedIndex === 1 ? -stepY : 0,
+                        steppedIndex === 2 ? -stepZ : 0,
+                    ],
+                    voxel,
+                };
+            }
+
+            // advance t to next nearest voxel boundary
+            if (txMax < tyMax) {
+                if (txMax < tzMax) {
+                    ix += stepX;
+                    t = txMax;
+                    txMax += txDelta;
+                    steppedIndex = 0;
+                } else {
+                    iz += stepZ;
+                    t = tzMax;
+                    tzMax += tzDelta;
+                    steppedIndex = 2;
+                }
+            } else {
+                if (tyMax < tzMax) {
+                    iy += stepY;
+                    t = tyMax;
+                    tyMax += tyDelta;
+                    steppedIndex = 1;
+                } else {
+                    iz += stepZ;
+                    t = tzMax;
+                    tzMax += tzDelta;
+                    steppedIndex = 2;
+                }
+            }
+        }
+        return null;
     }
 }

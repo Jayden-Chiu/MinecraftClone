@@ -11,7 +11,9 @@ import Stats from "../three/examples/jsm/libs/stats.module.js";
 function main() {
     const canvas = document.querySelector("#c");
     const renderer = new THREE.WebGLRenderer({ canvas });
-    const camera = new PlayerCamera();
+    var camera;
+    var world;
+    var controls;
 
     const scene = new THREE.Scene();
 
@@ -23,16 +25,12 @@ function main() {
     texture.magFilter = THREE.NearestFilter;
     texture.minFilter = THREE.NearestFilter;
 
-    const world = new World();
-
     const skybox = loader.load("textures/skybox.jpg", () => {
         const rt = new THREE.WebGLCubeRenderTarget(skybox.image.height);
         rt.fromEquirectangularTexture(renderer, skybox);
         scene.background = rt;
     });
 
-    // controls
-    const controls = new PlayerControls(camera, document.body, world, scene);
 
     // stats div
     const container = document.createElement("div");
@@ -70,7 +68,12 @@ function main() {
     }
 
     function init() {
+        world = new World();
+        camera = new PlayerCamera(canvas,world);
+        controls = new PlayerControls(camera, document.body, world, scene, canvas);
+
         world.setTexture(texture);
+
 
         if (world.debug) {
             scene.add(SceneConstants.PLAYER_CHUNK_BOX);
