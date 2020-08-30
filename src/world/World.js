@@ -61,7 +61,7 @@ export default class World {
         return chunk.getVoxel(fx, fy, fz);
     }
 
-    setVoxel(x, y, z) {
+    setVoxel(x, y, z, type) {
         const cx = Math.floor(x / WorldConstants.CHUNK_SIZE);
         const cz = Math.floor(z / WorldConstants.CHUNK_SIZE);
 
@@ -73,7 +73,9 @@ export default class World {
 
         if (!chunk) return;
 
-        chunk.setVoxel(fx, fy, fz);
+
+        chunk.setVoxel(fx, fy, fz, type);
+        chunk.updateMesh();
     }
 
     updateChunk(x, z) {

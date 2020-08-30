@@ -83,29 +83,29 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
         }
     }
 
-    placeVoxel(event, canvas) {
-        function getCanvasRelativePosition(event, canvas) {
-            const rect = canvas.getBoundingClientRect();
-            return {
-                x: ((event.clientX - rect.left) * canvas.width) / rect.width,
-                y: ((event.clientY - rect.top) * canvas.height) / rect.height,
-            };
-        }
-
-        const pos = getCanvasRelativePosition(event, canvas);
-        const x = (pos.x / canvas.width) * 2 - 1;
-        const y = (pos.y / canvas.height) * -2 + 1; // note we flip Y
-
+    placeVoxel() {
+        // init start and end vectors
         const start = new THREE.Vector3();
+        const dir = new THREE.Vector3();
         const end = new THREE.Vector3();
 
+        // get vector of camera direction
+        this.getWorldDirection( dir );
+        
+        // set starting vector to camera position in matrix world
         start.setFromMatrixPosition(this.matrixWorld);
-        end.set(x, y, 1).unproject(this);
+
+        // get end vector from start with certain distance
+        end.addVectors ( start, dir.multiplyScalar( CameraConstants.BLOCK_DISTANCE ) );
+
+        
+        // end.applyQuaternion(this.quaternion);
 
         const intersection = this.intersectRay(start, end);
 
         if (intersection) {
-            console.log(intersection);
+            this.world.setVoxel(...intersection.position,WorldConstants.BLOCK_TYPES.STONE);
+           
         }
     }
 

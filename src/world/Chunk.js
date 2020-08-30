@@ -131,13 +131,25 @@ export default class Chunk {
         const { geometry, t_geometry } = this.mesher.mesh();
         const { material, t_material } = this;
 
-        this.mesh = new THREE.Mesh(geometry, material);
+        const { cx, cz } = this;
+
+        // this.mesh = this.mesh ? this.mesh.geometry = geometry : new THREE.Mesh(geometry, material);
+
+        if (!this.mesh) {
+            this.mesh = new THREE.Mesh(geometry, material);
+        } else {
+            this.mesh.geometry = geometry;
+        }
         this.mesh.castShadow = true;
         this.mesh.receiveShadow = true;
-        this.mesh.name = [this.cx, this.cz];
+        this.mesh.name = [cx, cz];
 
-        this.t_mesh = new THREE.Mesh(t_geometry, t_material);
-        this.t_mesh.name = [this.cx, this.cz];
+        if (!this.t_mesh) {
+            this.t_mesh = new THREE.Mesh(t_geometry, t_material);
+        } else {
+            this.t_mesh.geometry = t_geometry;
+        }
+        this.t_mesh.name = [cx, cz];
     }
 
     generateTerrain(seed) {
