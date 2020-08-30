@@ -9,7 +9,6 @@ export const OCTAVES = [4, 2, 8];
 export const EXPONENT = 0.25;
 export const LEVELS = 12;
 
-
 // TERRAIN VALUES
 export const BASE_HEIGHT = 0;
 export const OCEAN_HEIGHT = 50;
@@ -18,9 +17,9 @@ export const BEACH_HEIGHT = 52;
 export const TREE_Y_CUTOFF = BEACH_HEIGHT + 3;
 export const TREE_MIN_HEIGHT = 4;
 export const TREE_MAX_HEIGHT = 6;
-export const TREE_HEIGHT_DIFF = TREE_MAX_HEIGHT-TREE_MIN_HEIGHT;
+export const TREE_HEIGHT_DIFF = TREE_MAX_HEIGHT - TREE_MIN_HEIGHT;
 
-export const SAND_HEIGHT_DIFF = BEACH_HEIGHT-OCEAN_HEIGHT;
+export const SAND_HEIGHT_DIFF = BEACH_HEIGHT - OCEAN_HEIGHT;
 export const DIRT_HEIGHT_DIFF = 4;
 export const DIRT_HEIGHT_VARIATION = 2;
 

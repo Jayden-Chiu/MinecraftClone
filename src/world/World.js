@@ -76,6 +76,8 @@ export default class World {
 
         chunk.setVoxel(fx, fy, fz, type);
         chunk.updateMesh();
+
+        for (const neighbor of chunk.getChunkNeighborsOfVoxel(fx,fy,fz)) neighbor.updateMesh();
     }
 
     updateChunk(x, z) {

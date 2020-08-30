@@ -27,7 +27,7 @@ export default class Chunk {
         this.mesher = new ChunkMesher(this);
     }
 
-    setVoxel(x, y, z, type, withNeighbors) {
+    setVoxel(x, y, z, type) {
         const { neighbors } = this;
         var index = this.calculateVoxelIndex(x, y, z);
 
@@ -93,15 +93,19 @@ export default class Chunk {
         return null;
     }
 
-    getVoxelFromNeighbors(x, y, z) {
+    getChunkNeighborsOfVoxel(x,y,z) {
         const { neighbors } = this;
+        const vNeighbors = [];
 
-        for (let i = 0; i < neighbors.length; ++i) {
-            const index = neighbors[i].calculateVoxelIndex(x, y, z);
-            if (index != null) return neighbors[i].getVoxel(x, y, z);
-        }
+        const {vx,vy,vz} = this.calculateVoxelCoordsInChunk(x,y,z);
 
-        return null;
+        if (vx == 0) vNeighbors.push(neighbors[7]);
+        if (vx == WorldConstants.CHUNK_SIZE - 1) vNeighbors.push(neighbors[3]);
+        if (vz == 0) vNeighbors.push(neighbors[5]);
+        if (vz == WorldConstants.CHUNK_SIZE - 1) vNeighbors.push(neighbors[1])
+
+        return vNeighbors;
+
     }
 
     calculateElevationIndex(x, z) {
@@ -125,6 +129,15 @@ export default class Chunk {
 
         var index = vx + vz * WorldConstants.CHUNK_SIZE + vy * WorldConstants.CHUNK_SIZE * WorldConstants.CHUNK_SIZE;
         return index;
+    }
+
+    calculateVoxelCoordsInChunk(x, y, z) {
+        const { cx, cz } = this;
+        var vx = x - WorldConstants.CHUNK_SIZE * cx;
+        var vy = y;
+        var vz = z - WorldConstants.CHUNK_SIZE * cz;
+
+        return {vx,vy,vz};
     }
 
     updateMesh() {
