@@ -5,7 +5,8 @@ import * as SceneConstants from "./constants/SceneConstants.js";
 import { PlayerCamera } from "./player/PlayerCamera.js";
 import { PlayerControls } from "./player/PlayerControls.js";
 
-import Stats from "../three/stats.module.js";
+
+import Stats from "../three/examples/jsm/libs/stats.module.js";
 
 function main() {
     const canvas = document.querySelector("#c");
