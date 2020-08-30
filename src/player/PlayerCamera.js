@@ -4,7 +4,7 @@ import * as SceneConstants from "../constants/SceneConstants.js";
 import World from "../world/World.js";
 
 export class PlayerCamera extends THREE.PerspectiveCamera {
-    constructor(canvas, world) {
+    constructor(canvas, world,scene) {
         super(CameraConstants.FOV, CameraConstants.ASPECT, CameraConstants.NEAR, CameraConstants.FAR);
         this.position.set(
             CameraConstants.CAMERA_DEFAULT_X,
@@ -90,22 +90,25 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
         const end = new THREE.Vector3();
 
         // get vector of camera direction
-        this.getWorldDirection( dir );
-        
+        this.getWorldDirection(dir);
+
         // set starting vector to camera position in matrix world
         start.setFromMatrixPosition(this.matrixWorld);
 
         // get end vector from start with certain distance
-        end.addVectors ( start, dir.multiplyScalar( CameraConstants.BLOCK_DISTANCE ) );
-
-        
-        // end.applyQuaternion(this.quaternion);
+        end.addVectors(start, dir.multiplyScalar(CameraConstants.BLOCK_DISTANCE));
 
         const intersection = this.intersectRay(start, end);
 
         if (intersection) {
-            this.world.setVoxel(...intersection.position,WorldConstants.BLOCK_TYPES.STONE);
-           
+
+            var voxelId = WorldConstants.BLOCK_TYPES.AIR;
+            const pos = intersection.position.map((v, ndx) => {
+                return v + intersection.normal[ndx] * (voxelId > 0 ? 0.5 : -0.5);
+              });
+
+
+            this.world.setVoxel(...pos, voxelId);
         }
     }
 
