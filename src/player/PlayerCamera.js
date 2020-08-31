@@ -20,6 +20,12 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
         this.canvas = canvas;
         this.world = world;
 
+        // default block to place
+        this.currBlock = WorldConstants.BLOCK_TYPES.STONE;
+
+        this.start = new THREE.Vector3();
+        this.dir = new THREE.Vector3();
+        this.end = new THREE.Vector3();
     }
 
     getCameraChunkCoords() {
@@ -76,10 +82,30 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
     }
 
     placeVoxel(voxelId) {
-        // init start and end vectors
-        const start = new THREE.Vector3();
-        const dir = new THREE.Vector3();
-        const end = new THREE.Vector3();
+        const intersection = this.calculateIntersection();
+        if (intersection) {
+            const pos = intersection.position.map((v, ndx) => {
+                return v + intersection.normal[ndx] * (voxelId > 0 ? 0.5 : -0.5);
+            });
+
+            this.world.setVoxel(...pos, voxelId);
+        }
+    }
+
+    setCurrentBlockTypeToHighlighted() {
+        const intersection = this.calculateIntersection();
+
+        if (intersection) {
+            const pos = intersection.position.map((v, ndx) => {
+                return Math.ceil(v + intersection.normal[ndx] * -0.5) - 0.5;
+            });
+
+            this.currBlock = this.world.getVoxel(...pos);
+        }
+    }
+
+    calculateIntersection() {
+        const { start, dir, end } = this;
 
         // get vector of camera direction
         this.getWorldDirection(dir);
@@ -90,15 +116,7 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
         // get end vector from start with certain distance
         end.addVectors(start, dir.multiplyScalar(CameraConstants.BLOCK_DISTANCE));
 
-        const intersection = this.intersectRay(start, end);
-
-        if (intersection) {
-            const pos = intersection.position.map((v, ndx) => {
-                return v + intersection.normal[ndx] * (voxelId > 0 ? 0.5 : -0.5);
-            });
-
-            this.world.setVoxel(...pos, voxelId);
-        }
+        return this.intersectRay(start, end);
     }
 
     intersectRay(start, end) {

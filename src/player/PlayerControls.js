@@ -9,6 +9,8 @@ export class PlayerControls extends PointerLockControls {
 
         this.wireframeOn = false;
 
+       
+
         this.world = world;
 
         this.addEventListener("lock", function () {});
@@ -43,17 +45,16 @@ export class PlayerControls extends PointerLockControls {
                 if (event.button === 0)
                     window.addEventListener("mouseup", self.camera.placeVoxel(WorldConstants.BLOCK_TYPES.AIR));
 
+                // middle click
+                if (event.button === 1) 
+                    window.addEventListener("mouseup", self.camera.setCurrentBlockTypeToHighlighted());
+
                 // right click
                 if (event.button === 2)
-                    window.addEventListener("mouseup", self.camera.placeVoxel(self.currBlock));
+                    window.addEventListener("mouseup", self.camera.placeVoxel(self.camera.currBlock));
             },
             { passive: false }
         );
-
-        // cursor vectors
-        this.start = new THREE.Vector3();
-        this.dir = new THREE.Vector3();
-        this.end = new THREE.Vector3();
 
         // voxel highlight
         const geometry = new THREE.EdgesGeometry(new THREE.BoxGeometry(1.005, 1.005, 1.005));
@@ -67,7 +68,7 @@ export class PlayerControls extends PointerLockControls {
 
     update() {
         // movement controls
-        const { keys, camera, start, dir, end } = this;
+        const { keys, camera } = this;
         // w
         if (keys.includes(87)) {
             this.moveForward(CameraConstants.MOVEMENT_SPEED);
@@ -97,16 +98,7 @@ export class PlayerControls extends PointerLockControls {
 
         // block highlighting
 
-        // get vector of camera direction
-        camera.getWorldDirection(dir);
-
-        // set starting vector to camera position in matrix world
-        start.setFromMatrixPosition(camera.matrixWorld);
-
-        // get end vector from start with certain distance
-        end.addVectors(start, dir.multiplyScalar(CameraConstants.BLOCK_DISTANCE));
-
-        const intersection = camera.intersectRay(start, end);
+        const intersection = camera.calculateIntersection();
 
         if (intersection) {
             const pos = intersection.position.map((v, ndx) => {
