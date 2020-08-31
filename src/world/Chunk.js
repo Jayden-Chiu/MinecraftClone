@@ -16,12 +16,12 @@ export default class Chunk {
 
         this.neighbors = new Array(8);
 
-        this.mesh;
-        this.t_mesh;
 
         this.material = material;
         this.t_material = t_material;
 
+        this.mesh;
+        this.t_mesh;
         this.texture;
 
         this.mesher = new ChunkMesher(this);
@@ -145,8 +145,6 @@ export default class Chunk {
         const { material, t_material } = this;
 
         const { cx, cz } = this;
-
-        // this.mesh = this.mesh ? this.mesh.geometry = geometry : new THREE.Mesh(geometry, material);
 
         if (!this.mesh) {
             this.mesh = new THREE.Mesh(geometry, material);

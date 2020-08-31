@@ -1,5 +1,6 @@
 import { PointerLockControls } from "../../three/examples/jsm/controls/PointerLockControls.js";
 import * as CameraConstants from "../constants/CameraConstants.js";
+import * as WorldConstants from "../constants/WorldConstants.js";
 
 export class PlayerControls extends PointerLockControls {
     constructor(camera, domElement, world, scene) {
@@ -29,6 +30,19 @@ export class PlayerControls extends PointerLockControls {
             }
             self.keys = arr;
         });
+
+        window.addEventListener(
+            "mousedown",
+            (event) => {
+                event.preventDefault();
+                if (event.button === 0)
+                window.addEventListener("mouseup", self.camera.placeVoxel(WorldConstants.BLOCK_TYPES.AIR));
+
+                if (event.button === 2)
+                window.addEventListener("mouseup", self.camera.placeVoxel(WorldConstants.BLOCK_TYPES.STONE));
+            },
+            { passive: false }
+        );
     }
 
     update() {

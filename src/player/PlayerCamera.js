@@ -20,14 +20,6 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
         this.canvas = canvas;
         this.world = world;
 
-        window.addEventListener(
-            "mousedown",
-            (event) => {
-                event.preventDefault();
-                window.addEventListener("mouseup", self.placeVoxel(event, self.canvas));
-            },
-            { passive: false }
-        );
     }
 
     getCameraChunkCoords() {
@@ -83,7 +75,7 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
         }
     }
 
-    placeVoxel() {
+    placeVoxel(voxelId) {
         // init start and end vectors
         const start = new THREE.Vector3();
         const dir = new THREE.Vector3();
@@ -101,7 +93,6 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
         const intersection = this.intersectRay(start, end);
 
         if (intersection) {
-            var voxelId = WorldConstants.BLOCK_TYPES.AIR;
             const pos = intersection.position.map((v, ndx) => {
                 return v + intersection.normal[ndx] * (voxelId > 0 ? 0.5 : -0.5);
             });

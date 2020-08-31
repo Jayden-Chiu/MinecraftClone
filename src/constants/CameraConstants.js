@@ -1,7 +1,7 @@
 import * as WorldConstants from "./WorldConstants.js";
 import * as GameConstants from "./GameConstants.js";
 
-export const RENDER_DISTANCE = 10;
+export const RENDER_DISTANCE = 8;
 
 export const CAMERA_DEFAULT_X = RENDER_DISTANCE * WorldConstants.CHUNK_SIZE + WorldConstants.CHUNK_SIZE/2 + 0.01;
 export const CAMERA_DEFAULT_Y = WorldConstants.WORLD_HEIGHT/3 + 0.01;
