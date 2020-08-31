@@ -9,6 +9,8 @@ export class PlayerControls extends PointerLockControls {
 
         this.wireframeOn = false;
 
+        this.world = world;
+
         this.addEventListener("lock", function () {});
         this.addEventListener("unlock", function () {});
 
@@ -31,22 +33,41 @@ export class PlayerControls extends PointerLockControls {
             self.keys = arr;
         });
 
+        // mouse controls
         window.addEventListener(
             "mousedown",
             (event) => {
                 event.preventDefault();
-                if (event.button === 0)
-                window.addEventListener("mouseup", self.camera.placeVoxel(WorldConstants.BLOCK_TYPES.AIR));
 
+                // left click
+                if (event.button === 0)
+                    window.addEventListener("mouseup", self.camera.placeVoxel(WorldConstants.BLOCK_TYPES.AIR));
+
+                // right click
                 if (event.button === 2)
-                window.addEventListener("mouseup", self.camera.placeVoxel(WorldConstants.BLOCK_TYPES.STONE));
+                    window.addEventListener("mouseup", self.camera.placeVoxel(self.currBlock));
             },
             { passive: false }
         );
+
+        // cursor vectors
+        this.start = new THREE.Vector3();
+        this.dir = new THREE.Vector3();
+        this.end = new THREE.Vector3();
+
+        // voxel highlight
+        const geometry = new THREE.EdgesGeometry(new THREE.BoxGeometry(1.005, 1.005, 1.005));
+        const material = new THREE.LineBasicMaterial({ color: "black", fog: false, linewidth: 2, depthTest: true })
+        this.voxelHighlight = new THREE.LineSegments( geometry, material );
+        this.voxelHighlight.visible = false;
+
+
+        scene.add(this.voxelHighlight);
     }
 
     update() {
-        const { keys } = this;
+        // movement controls
+        const { keys, camera, start, dir, end } = this;
         // w
         if (keys.includes(87)) {
             this.moveForward(CameraConstants.MOVEMENT_SPEED);
@@ -72,6 +93,30 @@ export class PlayerControls extends PointerLockControls {
         // shift
         if (keys.includes(16)) {
             this.getObject().position.y -= CameraConstants.MOVEMENT_SPEED;
+        }
+
+        // block highlighting
+
+        // get vector of camera direction
+        camera.getWorldDirection(dir);
+
+        // set starting vector to camera position in matrix world
+        start.setFromMatrixPosition(camera.matrixWorld);
+
+        // get end vector from start with certain distance
+        end.addVectors(start, dir.multiplyScalar(CameraConstants.BLOCK_DISTANCE));
+
+        const intersection = camera.intersectRay(start, end);
+
+        if (intersection) {
+            const pos = intersection.position.map((v, ndx) => {
+                return Math.ceil(v + intersection.normal[ndx] * -0.5) - 0.5;
+            });
+
+            this.voxelHighlight.visible = true;
+            this.voxelHighlight.position.set(...pos);
+        } else {
+            this.voxelHighlight.visible = false;
         }
     }
 }

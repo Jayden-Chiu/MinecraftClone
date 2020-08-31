@@ -19,4 +19,4 @@ export const MOVEMENT_SPEED = 5.6/GameConstants.TICK_RATE;
 export const ACCELERATION = 0.05;
 
 // VOXEL PLACEMENT
-export const BLOCK_DISTANCE = 10;
+export const BLOCK_DISTANCE = 5;
