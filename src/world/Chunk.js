@@ -224,9 +224,9 @@ export default class Chunk {
 
         // generate random trees using poisson disk sampling
         var p = new PoissonDiskSampling({
-            shape: [WorldConstants.CHUNK_SIZE, WorldConstants.CHUNK_SIZE],
-            minDistance: 13,
-            maxDistance: 13,
+            shape: [WorldConstants.CHUNK_SIZE - 4, WorldConstants.CHUNK_SIZE - 4],
+            minDistance: 11,
+            maxDistance: 12,
             tries: 10,
         });
         var points = p.fill();
@@ -235,8 +235,8 @@ export default class Chunk {
             const x = Math.floor(point[0]);
             const z = Math.floor(point[1]);
 
-            const vx = cx * WorldConstants.CHUNK_SIZE + x;
-            const vz = cz * WorldConstants.CHUNK_SIZE + z;
+            const vx = cx * WorldConstants.CHUNK_SIZE + x + 2;
+            const vz = cz * WorldConstants.CHUNK_SIZE + z + 2;
 
             const y = elevation[this.calculateElevationIndex(x, z)];
 

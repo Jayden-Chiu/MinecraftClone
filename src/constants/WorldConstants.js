@@ -138,11 +138,11 @@ export const CHUNK_NEIGHBORS = [
 
 export const BLOCK_TYPES = {
     AIR: 0,
-    DIRT: 14,
-    GRASS: 13,
-    WATER: 12,
-    SAND: 11,
-    STONE: 2,
-    LOG: 3,
-    LEAVES: 4,
+    DIRT: { id: 14, isTransparent: false },
+    GRASS: { id: 13, isTransparent: false },
+    WATER: { id: 12, isTransparent: true },
+    SAND: { id: 11, isTransparent: false },
+    STONE: { id: 2, isTransparent: false },
+    LOG: { id: 3, isTransparent: false },
+    LEAVES: { id: 4, isTransparent: true },
 };

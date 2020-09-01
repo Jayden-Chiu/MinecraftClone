@@ -58,7 +58,7 @@ export class PlayerControls extends PointerLockControls {
 
         // voxel highlight
         const geometry = new THREE.EdgesGeometry(new THREE.BoxGeometry(1.005, 1.005, 1.005));
-        const material = new THREE.LineBasicMaterial({ color: "black", fog: false, linewidth: 2, depthTest: true })
+        const material = new THREE.LineBasicMaterial({ color: "black", fog: false, linewidth: 2, opacity: 0.5, transparent: true, depthTest: true })
         this.voxelHighlight = new THREE.LineSegments( geometry, material );
         this.voxelHighlight.visible = false;
 

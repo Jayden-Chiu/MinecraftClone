@@ -81,14 +81,14 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
         }
     }
 
-    placeVoxel(voxelId) {
+    placeVoxel(voxel) {
         const intersection = this.calculateIntersection();
         if (intersection) {
             const pos = intersection.position.map((v, ndx) => {
-                return v + intersection.normal[ndx] * (voxelId > 0 ? 0.5 : -0.5);
+                return v + intersection.normal[ndx] * (voxel ? 0.5 : -0.5);
             });
 
-            this.world.setVoxel(...pos, voxelId);
+            this.world.setVoxel(...pos, voxel);
         }
     }
 
@@ -156,7 +156,7 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
         // main loop along raycast vector
         while (t <= len) {
             const voxel = this.world.getVoxel(ix, iy, iz);
-            if (voxel) {
+            if (voxel && voxel !== WorldConstants.BLOCK_TYPES.WATER) {
                 return {
                     position: [start.x + t * dx, start.y + t * dy, start.z + t * dz],
                     normal: [

@@ -48,15 +48,12 @@ export default class ChunkMesher {
 
                                 //add to arrays for BufferGeometry
                                 for (const { pos, uv } of vertices) {
-                                    if (
-                                        voxel !== WorldConstants.BLOCK_TYPES.WATER &&
-                                        voxel !== WorldConstants.BLOCK_TYPES.LEAVES
-                                    ) {
+                                    if (!voxel.isTransparent) {
                                         positions.push(vx + pos[0], vy + pos[1], vz + pos[2]);
 
                                         normals.push(...dir);
                                         uvs.push(
-                                            ((voxel + uv[0]) * TextureConstants.TILE_SIZE) /
+                                            ((voxel.id + uv[0]) * TextureConstants.TILE_SIZE) /
                                                 TextureConstants.TILE_TEXTURE_WIDTH,
                                             1 -
                                                 ((uvRow + 1 - uv[1]) * TextureConstants.TILE_SIZE) /
@@ -71,7 +68,7 @@ export default class ChunkMesher {
 
                                         t_normals.push(...dir);
                                         t_uvs.push(
-                                            ((voxel + uv[0]) * TextureConstants.TILE_SIZE) /
+                                            ((voxel.id + uv[0]) * TextureConstants.TILE_SIZE) /
                                                 TextureConstants.TILE_TEXTURE_WIDTH,
                                             1 -
                                                 ((uvRow + 1 - uv[1]) * TextureConstants.TILE_SIZE) /
@@ -135,6 +132,4 @@ export default class ChunkMesher {
 
         return { geometry, t_geometry };
     }
-
-    
 }
