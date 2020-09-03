@@ -109,11 +109,8 @@ export default class Chunk {
     }
 
     calculateElevationIndex(x, z) {
-        const { cx, cz } = this;
-        var vx = x - WorldConstants.CHUNK_SIZE * cx;
-        var vz = z - WorldConstants.CHUNK_SIZE * cz;
 
-        var index = vx + vz * WorldConstants.CHUNK_SIZE;
+        var index = x + z * WorldConstants.CHUNK_SIZE;
         return index;
     }
 

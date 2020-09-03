@@ -15,5 +15,44 @@ body {
     top: 50%;
     left: 50%;
     display: block;
-    transform:  translateY(-50%) translateX(-50%);
+    transform: translateY(-50%) translateX(-50%);
+}
+
+#hud {
+    position: absolute;
+    bottom: 2%;
+    left: 50%;
+    background: rgba(0, 0, 0, 0.5);
+
+    transform: translate(-50%, 0);
+
+    white-space: nowrap;
+    overflow: hidden;
+
+    padding:3px;
+
+}
+
+#hud input[type="radio"] {
+    width: 0;
+    height: 0;
+    display: none;
+    
+}
+
+#hud input[type="radio"] + label {
+    vertical-align:top;
+    background-image: url("textures/textureatlas.png");
+    background-size: 1600% 400%;
+    image-rendering: pixelated;
+
+    width: 64px;
+    height: 64px;
+    display: inline-block;
+
+    margin:7px;
+
+    outline: 4px solid black;
+    
+    
 }

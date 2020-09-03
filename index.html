@@ -1,20 +1,57 @@
 <!DOCTYPE html>
 <html lang="en">
-<head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Minecraft Clone</title>
-    <link rel="stylesheet" href="styles.css">
-</head>
-<body>
-    <canvas id="c"></canvas>
-    <div id="crosshair">
-        <img src="textures/crosshair.png" class="crosshair" />
-    </div>
+    <head>
+        <meta charset="UTF-8" />
+        <meta class="viewport" content="width=device-width, initial-scale=1.0" />
+        <title>Minecraft Clone</title>
+        <link rel="stylesheet" href="styles.css" />
+    </head>
+    <body>
+        <canvas id="c"></canvas>
+        <div id="crosshair">
+            <img src="textures/crosshair.png" class="crosshair" />
+        </div>
 
-    <script src="three/build/three.min.js"></script>
-    <script src="https://cdn.jsdelivr.net/gh/kchapelier/poisson-disk-sampling@2.2.2/build/poisson-disk-sampling.min.js"></script>
-    <script src='src/perlin.js'></script>
-    <script type="module" src="src/main.js"></script>
-</body>
+        <div id="hud">
+            <div class="hotbar">
+                <input type="radio" class="voxel" id="voxel1" value="1" /><label
+                    for="voxel1"
+                    style="background-position: -0% -0%"
+                ></label
+                ><input type="radio" class="voxel" id="voxel2" value="2" /><label
+                    for="voxel2"
+                    style="background-position: -100% -0%"
+                ></label
+                ><input type="radio" class="voxel" id="voxel3" value="3" /><label
+                    for="voxel3"
+                    style="background-position: -200% -0%"
+                ></label
+                ><input type="radio" class="voxel" id="voxel4" value="4" /><label
+                    for="voxel4"
+                    style="background-position: -300% -0%"
+                ></label
+                ><input type="radio" class="voxel" id="voxel5" value="5" /><label
+                    for="voxel5"
+                    style="background-position: -400% -0%"
+                ></label
+                ><input type="radio" class="voxel" id="voxel6" value="6" /><label
+                    for="voxel6"
+                    style="background-position: -500% -0%"
+                ></label
+                ><input type="radio" class="voxel" id="voxel7" value="7" /><label
+                    for="voxel7"
+                    style="background-position: -600% -0%"
+                ></label
+                ><input type="radio" class="voxel" id="voxel8" value="8" /><label
+                    for="voxel8"
+                    style="background-position: -700% -0%"
+                ></label>
+            </div>
+        </div>
+
+        <script src="three/build/three.min.js"></script>
+        <script src="https://cdn.jsdelivr.net/gh/kchapelier/poisson-disk-sampling@2.2.2/build/poisson-disk-sampling.min.js"></script>
+        <script src="src/perlin.js"></script>
+        <script type="module" src="src/main.js"></script>
+    </body>
 </html>
