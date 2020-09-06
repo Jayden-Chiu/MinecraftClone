@@ -22,14 +22,14 @@ body {
     position: absolute;
     bottom: 2%;
     left: 50%;
-    background: rgba(0, 0, 0, 0.5);
+    background: rgb(30,30,30);
 
     transform: translate(-50%, 0);
 
     white-space: nowrap;
     overflow: hidden;
 
-    padding:3px;
+    padding:4px;
 
 }
 
@@ -50,9 +50,8 @@ body {
     height: 64px;
     display: inline-block;
 
-    margin:7px;
+    margin:4px;
 
-    outline: 4px solid black;
     
     
 }
