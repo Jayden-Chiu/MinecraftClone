@@ -44,20 +44,6 @@ export class PlayerControls extends PointerLockControls {
                 if (event.button === 0)
                     window.addEventListener("mouseup", self.camera.placeVoxel(WorldConstants.BLOCK_TYPES.AIR));
 
-                // middle click
-                if (event.button === 1)
-                    window.addEventListener("mouseup", () => {
-                        self.camera.setCurrentBlockTypeToHighlighted();
-                        for (const button of hotbarButtons) {
-                            if (button.checked) {
-                                button.checked = false;
-                                break;
-                            }
-                        }
-
-                        hotbarButtons.item(self.camera.currBlock.id).checked = true;
-                    });
-
                 // right click
                 if (event.button === 2)
                     window.addEventListener("mouseup", self.camera.placeVoxel(self.camera.currBlock));
@@ -81,7 +67,8 @@ export class PlayerControls extends PointerLockControls {
         scene.add(this.voxelHighlight);
 
         // hotbar
-        const hotbarButtons = document.querySelectorAll("input.voxel");
+        this.hotbarButtons = document.querySelectorAll("input.voxel");
+        const hotbarButtons = this.hotbarButtons;
 
         for (const button of hotbarButtons) {
             button.addEventListener("click", (event) => {

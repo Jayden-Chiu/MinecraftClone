@@ -92,18 +92,6 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
         }
     }
 
-    setCurrentBlockTypeToHighlighted() {
-        const intersection = this.calculateIntersection();
-
-        if (intersection) {
-            const pos = intersection.position.map((v, ndx) => {
-                return Math.ceil(v + intersection.normal[ndx] * -0.5) - 0.5;
-            });
-
-            this.currBlock = this.world.getVoxel(...pos);
-        }
-    }
-
     calculateIntersection() {
         const { start, dir, end } = this;
 
