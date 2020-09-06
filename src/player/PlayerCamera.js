@@ -20,8 +20,8 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
         this.canvas = canvas;
         this.world = world;
 
-        // default block to place
-        this.currBlock = WorldConstants.BLOCK_TYPES.STONE;
+        // default block to place (grass)
+        this.currBlock = Object.entries(WorldConstants.BLOCK_TYPES)[1][1];
 
         this.start = new THREE.Vector3();
         this.dir = new THREE.Vector3();

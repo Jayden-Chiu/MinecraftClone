@@ -51,7 +51,8 @@ body {
     display: inline-block;
 
     margin:4px;
-
-    
-    
 }
+
+#hud input[type=radio]:checked + label {
+    outline: 2px solid white;
+  }

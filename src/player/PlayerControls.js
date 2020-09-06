@@ -9,8 +9,6 @@ export class PlayerControls extends PointerLockControls {
 
         this.wireframeOn = false;
 
-       
-
         this.world = world;
 
         this.addEventListener("lock", function () {});
@@ -21,11 +19,12 @@ export class PlayerControls extends PointerLockControls {
             self.lock();
         });
 
+        // keyboard controls
         this.keys = [];
-        document.addEventListener("keydown", function (e) {
+        document.addEventListener("keydown", (e) => {
             self.keys.push(e.keyCode);
         });
-        document.addEventListener("keyup", function (e) {
+        document.addEventListener("keyup", (e) => {
             var arr = [];
             for (var i = 0; i < self.keys.length; i++) {
                 if (self.keys[i] != e.keyCode) {
@@ -46,8 +45,18 @@ export class PlayerControls extends PointerLockControls {
                     window.addEventListener("mouseup", self.camera.placeVoxel(WorldConstants.BLOCK_TYPES.AIR));
 
                 // middle click
-                if (event.button === 1) 
-                    window.addEventListener("mouseup", self.camera.setCurrentBlockTypeToHighlighted());
+                if (event.button === 1)
+                    window.addEventListener("mouseup", () => {
+                        self.camera.setCurrentBlockTypeToHighlighted();
+                        for (const button of hotbarButtons) {
+                            if (button.checked) {
+                                button.checked = false;
+                                break;
+                            }
+                        }
+
+                        hotbarButtons.item(self.camera.currBlock.id).checked = true;
+                    });
 
                 // right click
                 if (event.button === 2)
@@ -58,12 +67,50 @@ export class PlayerControls extends PointerLockControls {
 
         // voxel highlight
         const geometry = new THREE.EdgesGeometry(new THREE.BoxGeometry(1.005, 1.005, 1.005));
-        const material = new THREE.LineBasicMaterial({ color: "black", fog: false, linewidth: 2, opacity: 0.5, transparent: true, depthTest: true })
-        this.voxelHighlight = new THREE.LineSegments( geometry, material );
+        const material = new THREE.LineBasicMaterial({
+            color: "black",
+            fog: false,
+            linewidth: 2,
+            opacity: 0.5,
+            transparent: true,
+            depthTest: true,
+        });
+        this.voxelHighlight = new THREE.LineSegments(geometry, material);
         this.voxelHighlight.visible = false;
 
-
         scene.add(this.voxelHighlight);
+
+        // hotbar
+        const hotbarButtons = document.querySelectorAll("input.voxel");
+
+        for (const button of hotbarButtons) {
+            button.addEventListener("click", (event) => {
+                event.preventDefault();
+            });
+
+            if (button.id == camera.currBlock.id) {
+                button.checked = true;
+            }
+        }
+
+        window.addEventListener("wheel", (event) => {
+            for (const button of hotbarButtons) {
+                if (button.checked) {
+                    var nextButton;
+                    const id = parseInt(button.id)
+                    if (event.deltaY > 0) {
+                        nextButton = id === hotbarButtons.length-1 ? hotbarButtons[0] : hotbarButtons.item(id+1);;
+                    } else {
+                        nextButton = id === 0 ? hotbarButtons.item(hotbarButtons.length-1) : hotbarButtons.item(id-1);
+                    }
+                    button.checked = false;
+                    nextButton.checked = true;
+
+                    camera.currBlock = Object.entries(WorldConstants.BLOCK_TYPES)[parseInt(nextButton.id)+1][1];
+                    break;
+                }
+            }
+        });
     }
 
     update() {
