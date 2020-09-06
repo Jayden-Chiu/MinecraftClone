@@ -84,25 +84,36 @@ export class PlayerControls extends PointerLockControls {
             for (const button of hotbarButtons) {
                 if (button.checked) {
                     var nextButton;
-                    const id = parseInt(button.id)
+                    const id = parseInt(button.id);
                     if (event.deltaY > 0) {
-                        nextButton = id === hotbarButtons.length-1 ? hotbarButtons[0] : hotbarButtons.item(id+1);;
+                        nextButton = id === hotbarButtons.length - 1 ? hotbarButtons[0] : hotbarButtons.item(id + 1);
                     } else {
-                        nextButton = id === 0 ? hotbarButtons.item(hotbarButtons.length-1) : hotbarButtons.item(id-1);
+                        nextButton =
+                            id === 0 ? hotbarButtons.item(hotbarButtons.length - 1) : hotbarButtons.item(id - 1);
                     }
                     button.checked = false;
                     nextButton.checked = true;
 
-                    camera.currBlock = Object.entries(WorldConstants.BLOCK_TYPES)[parseInt(nextButton.id)+1][1];
+                    camera.currBlock = Object.entries(WorldConstants.BLOCK_TYPES)[parseInt(nextButton.id) + 1][1];
                     break;
                 }
             }
         });
+
+        const box = new THREE.BoxGeometry(1, 1.75, 1);
+        const boxMaterial = new THREE.MeshBasicMaterial({ color: "black", side: THREE.FrontSide });
+        this.boundingBox = new THREE.Mesh(box, boxMaterial);
+
+        this.updateBoundingBox();
+        scene.add(this.boundingBox);
     }
 
     update() {
         // movement controls
-        const { keys, camera } = this;
+        const { keys, camera, boundingBox } = this;
+
+        const currPosition = camera.position.clone();
+
         // w
         if (keys.includes(87)) {
             this.moveForward(CameraConstants.MOVEMENT_SPEED);
@@ -130,6 +141,10 @@ export class PlayerControls extends PointerLockControls {
             this.getObject().position.y -= CameraConstants.MOVEMENT_SPEED;
         }
 
+        const newPosition = camera.position;
+        this.detectCollision(currPosition, newPosition);
+        this.updateBoundingBox();
+
         // block highlighting
 
         const intersection = camera.calculateIntersection();
@@ -144,5 +159,44 @@ export class PlayerControls extends PointerLockControls {
         } else {
             this.voxelHighlight.visible = false;
         }
+    }
+
+    updateBoundingBox() {
+        const { boundingBox, camera } = this;
+
+        boundingBox.position.set(camera.position.x, camera.position.y-0.75, camera.position.z);
+    }
+
+    detectCollision(currPosition, newPosition) {
+        const { world, boundingBox, camera } = this;
+
+        const dx = newPosition.x - currPosition.x;
+        const dy = newPosition.y - currPosition.y;
+        const dz = newPosition.z - currPosition.z;
+
+        var canMoveX = true;
+        var canMoveY = true;
+        var canMoveZ = true;
+
+        for (const vertice of boundingBox.geometry.vertices) {
+            const verticeCopy = vertice.clone();
+            boundingBox.localToWorld(verticeCopy);
+
+            const nx = verticeCopy.x + dx;
+            const ny = verticeCopy.y + dy;
+            const nz = verticeCopy.z + dz;
+
+            const px = verticeCopy.x;
+            const py = verticeCopy.y;
+            const pz = verticeCopy.z;
+
+            if (canMoveX) if (world.getVoxel(nx, py, pz)) canMoveX = false;
+            if (canMoveY) if (world.getVoxel(px, ny, pz)) canMoveY = false;
+            if (canMoveZ) if (world.getVoxel(px, py, nz)) canMoveZ = false;
+        }
+
+        if (!canMoveX) this.getObject().position.x -= dx;
+        if (!canMoveY) this.getObject().position.y -= dy;
+        if (!canMoveZ) this.getObject().position.z -= dz;
     }
 }
