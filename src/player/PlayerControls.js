@@ -42,17 +42,25 @@ export class PlayerControls extends PointerLockControls {
 
                 // left click
                 if (event.button === 0)
-                    window.addEventListener("mouseup", self.camera.placeVoxel(WorldConstants.BLOCK_TYPES.AIR));
+                    window.addEventListener(
+                        "mouseup",
+                        self.placeVoxel(WorldConstants.BLOCK_TYPES.AIR)
+                    );
 
                 // right click
                 if (event.button === 2)
-                    window.addEventListener("mouseup", self.camera.placeVoxel(self.camera.currBlock));
+                    window.addEventListener(
+                        "mouseup",
+                        self.placeVoxel(self.camera.currBlock)
+                    );
             },
             { passive: false }
         );
 
         // voxel highlight
-        const geometry = new THREE.EdgesGeometry(new THREE.BoxGeometry(1.005, 1.005, 1.005));
+        const geometry = new THREE.EdgesGeometry(
+            new THREE.BoxGeometry(1.005, 1.005, 1.005)
+        );
         const material = new THREE.LineBasicMaterial({
             color: "black",
             fog: false,
@@ -86,22 +94,32 @@ export class PlayerControls extends PointerLockControls {
                     var nextButton;
                     const id = parseInt(button.id);
                     if (event.deltaY > 0) {
-                        nextButton = id === hotbarButtons.length - 1 ? hotbarButtons[0] : hotbarButtons.item(id + 1);
+                        nextButton =
+                            id === hotbarButtons.length - 1
+                                ? hotbarButtons[0]
+                                : hotbarButtons.item(id + 1);
                     } else {
                         nextButton =
-                            id === 0 ? hotbarButtons.item(hotbarButtons.length - 1) : hotbarButtons.item(id - 1);
+                            id === 0
+                                ? hotbarButtons.item(hotbarButtons.length - 1)
+                                : hotbarButtons.item(id - 1);
                     }
                     button.checked = false;
                     nextButton.checked = true;
 
-                    camera.currBlock = Object.entries(WorldConstants.BLOCK_TYPES)[parseInt(nextButton.id) + 1][1];
+                    camera.currBlock = Object.entries(
+                        WorldConstants.BLOCK_TYPES
+                    )[parseInt(nextButton.id) + 1][1];
                     break;
                 }
             }
         });
 
         const box = new THREE.BoxGeometry(1, 1.75, 1);
-        const boxMaterial = new THREE.MeshBasicMaterial({ color: "black", side: THREE.FrontSide });
+        const boxMaterial = new THREE.MeshBasicMaterial({
+            color: "black",
+            side: THREE.FrontSide,
+        });
         this.boundingBox = new THREE.Mesh(box, boxMaterial);
 
         this.updateBoundingBox();
@@ -164,11 +182,15 @@ export class PlayerControls extends PointerLockControls {
     updateBoundingBox() {
         const { boundingBox, camera } = this;
 
-        boundingBox.position.set(camera.position.x, camera.position.y-0.75, camera.position.z);
+        boundingBox.position.set(
+            camera.position.x,
+            camera.position.y - 0.75,
+            camera.position.z
+        );
     }
 
     detectCollision(currPosition, newPosition) {
-        const { world, boundingBox, camera } = this;
+        const { world, boundingBox } = this;
 
         const dx = newPosition.x - currPosition.x;
         const dy = newPosition.y - currPosition.y;
@@ -177,6 +199,9 @@ export class PlayerControls extends PointerLockControls {
         var canMoveX = true;
         var canMoveY = true;
         var canMoveZ = true;
+
+        // check each vertex of player's bounding box and see if  player's new position in each direction
+        // is blocked by voxel
 
         for (const vertice of boundingBox.geometry.vertices) {
             const verticeCopy = vertice.clone();
@@ -190,13 +215,58 @@ export class PlayerControls extends PointerLockControls {
             const py = verticeCopy.y;
             const pz = verticeCopy.z;
 
-            if (canMoveX) if (world.getVoxel(nx, py, pz)) canMoveX = false;
-            if (canMoveY) if (world.getVoxel(px, ny, pz)) canMoveY = false;
-            if (canMoveZ) if (world.getVoxel(px, py, nz)) canMoveZ = false;
+            if (canMoveX) {
+                const voxel = world.getVoxel(nx, py, pz);
+                if (voxel && voxel !== WorldConstants.BLOCK_TYPES.WATER)
+                    canMoveX = false;
+            }
+            if (canMoveY) {
+                const voxel = world.getVoxel(px, ny, pz);
+                if (voxel && voxel !== WorldConstants.BLOCK_TYPES.WATER)
+                    canMoveY = false;
+            }
+            if (canMoveZ) {
+                const voxel = world.getVoxel(px, py, nz);
+                if (voxel && voxel !== WorldConstants.BLOCK_TYPES.WATER)
+                    canMoveZ = false;
+            }
         }
 
         if (!canMoveX) this.getObject().position.x -= dx;
         if (!canMoveY) this.getObject().position.y -= dy;
         if (!canMoveZ) this.getObject().position.z -= dz;
+    }
+
+    placeVoxel(voxel) {
+        const { camera, world, boundingBox } = this;
+
+        const intersection = camera.calculateIntersection();
+        if (intersection) {
+            const pos = intersection.position.map((v, ndx) => {
+                return v + intersection.normal[ndx] * (voxel ? 0.5 : -0.5);
+            });
+
+            
+
+            const fPos = pos.map(x => {
+                return Math.floor(x);
+            });
+
+            var canPlace = true;
+            for (const vertice of boundingBox.geometry.vertices) {
+                const verticeCopy = vertice.clone();
+                boundingBox.localToWorld(verticeCopy);
+    
+                const vertPos = Object.values(verticeCopy).map(x => {
+                    return Math.floor(x);
+                });
+
+                // don't place voxel if where you're trying to place the voxel is 
+                // inside the player's body
+                if (JSON.stringify(fPos) === JSON.stringify(vertPos)) canPlace = false;
+            }
+
+            if (canPlace) world.setVoxel(...pos, voxel);
+        }
     }
 }
