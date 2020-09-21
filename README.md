@@ -2,6 +2,9 @@
 
 A Minecraft-like voxel engine in the browser created using JavaScript and Three.js.
 
+[Try the interactive demo here](https://jayden-chiu.github.io/MinecraftClone/.)
+(The page may take some time to load, be patient!)
+
 ## Controls
 - **Move forward/backward** with W S
 - **Strafe left/right** with A D
