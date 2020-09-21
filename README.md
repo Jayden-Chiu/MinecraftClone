@@ -11,6 +11,7 @@ A Minecraft-like voxel engine in the browser created using JavaScript and Three.
 - **Break blocks** with left click
 - **Place blocks** with right click
 - **Fly up/down** using space and shift
+- **Change blocks** using scroll wheel
 - **Enable debug** using F
 
 ## Disclaimer
