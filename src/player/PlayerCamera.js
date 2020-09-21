@@ -2,10 +2,16 @@ import * as CameraConstants from "../constants/CameraConstants.js";
 import * as WorldConstants from "../constants/WorldConstants.js";
 import * as SceneConstants from "../constants/SceneConstants.js";
 import World from "../world/World.js";
+import { Camera } from "../../three/src/Three.js";
 
 export class PlayerCamera extends THREE.PerspectiveCamera {
     constructor(canvas, world, scene) {
-        super(CameraConstants.FOV, CameraConstants.ASPECT, CameraConstants.NEAR, CameraConstants.FAR);
+        super(
+            CameraConstants.FOV,
+            CameraConstants.ASPECT,
+            CameraConstants.NEAR,
+            CameraConstants.FAR
+        );
         this.position.set(
             CameraConstants.CAMERA_DEFAULT_X,
             CameraConstants.CAMERA_DEFAULT_Y,
@@ -23,11 +29,23 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
         // default block to place (grass)
         this.currBlock = Object.entries(WorldConstants.BLOCK_TYPES)[1][1];
 
+        // vectors for ray casting from player cursor
         this.start = new THREE.Vector3();
         this.dir = new THREE.Vector3();
         this.end = new THREE.Vector3();
+
+        // velocities in each direction
+        this.xSpeed = 0;
+        this.ySpeed = 0;
+        this.zSpeed = 0;
+        this.canJump = false;
     }
 
+    jump() {
+        // if (!canJump) return;
+        this.ySpeed += CameraConstants.ACCELERATION;
+        console.log(this.ySpeed);
+    }
     getCameraChunkCoords() {
         const x = this.position.x;
         const y = this.position.y;
@@ -68,7 +86,11 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
 
     updateFog(scene, world) {
         if (world.debug) return;
-        const voxel = world.getVoxel(this.position.x, this.position.y, this.position.z);
+        const voxel = world.getVoxel(
+            this.position.x,
+            this.position.y,
+            this.position.z
+        );
 
         if (voxel === WorldConstants.BLOCK_TYPES.WATER) {
             scene.fog = SceneConstants.WATER_FOG;
@@ -91,7 +113,10 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
         start.setFromMatrixPosition(this.matrixWorld);
 
         // get end vector from start with certain distance
-        end.addVectors(start, dir.multiplyScalar(CameraConstants.BLOCK_DISTANCE));
+        end.addVectors(
+            start,
+            dir.multiplyScalar(CameraConstants.BLOCK_DISTANCE)
+        );
 
         return this.intersectRay(start, end);
     }
@@ -135,7 +160,11 @@ export class PlayerCamera extends THREE.PerspectiveCamera {
             const voxel = this.world.getVoxel(ix, iy, iz);
             if (voxel && voxel !== WorldConstants.BLOCK_TYPES.WATER) {
                 return {
-                    position: [start.x + t * dx, start.y + t * dy, start.z + t * dz],
+                    position: [
+                        start.x + t * dx,
+                        start.y + t * dy,
+                        start.z + t * dz,
+                    ],
                     normal: [
                         steppedIndex === 0 ? -stepX : 0,
                         steppedIndex === 1 ? -stepY : 0,

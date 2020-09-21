@@ -115,7 +115,7 @@ export class PlayerControls extends PointerLockControls {
             }
         });
 
-        const box = new THREE.BoxGeometry(1, 1.75, 1);
+        const box = new THREE.BoxGeometry(0.8, 1.75, 0.8);
         const boxMaterial = new THREE.MeshBasicMaterial({
             color: "black",
             side: THREE.FrontSide,
@@ -246,24 +246,26 @@ export class PlayerControls extends PointerLockControls {
                 return v + intersection.normal[ndx] * (voxel ? 0.5 : -0.5);
             });
 
-            
-
-            const fPos = pos.map(x => {
+            // position of voxel being placed
+            const fPos = pos.map((x) => {
                 return Math.floor(x);
             });
 
             var canPlace = true;
+
+            // check each vertex of bounding box to check for voxel being placed
             for (const vertice of boundingBox.geometry.vertices) {
                 const verticeCopy = vertice.clone();
                 boundingBox.localToWorld(verticeCopy);
-    
-                const vertPos = Object.values(verticeCopy).map(x => {
+
+                const vertPos = Object.values(verticeCopy).map((x) => {
                     return Math.floor(x);
                 });
 
-                // don't place voxel if where you're trying to place the voxel is 
+                // don't place voxel if where you're trying to place the voxel is
                 // inside the player's body
-                if (JSON.stringify(fPos) === JSON.stringify(vertPos)) canPlace = false;
+                if (JSON.stringify(fPos) === JSON.stringify(vertPos))
+                    canPlace = false;
             }
 
             if (canPlace) world.setVoxel(...pos, voxel);

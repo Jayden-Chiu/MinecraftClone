@@ -15,8 +15,12 @@ export const NEAR = 0.1;
 export const FAR = 1000;
 
 // MOVEMENT
-export const MOVEMENT_SPEED = 5.6/GameConstants.TICK_RATE;
+export const MOVEMENT_SPEED = 0.28;
 export const ACCELERATION = 0.05;
+export const GRAVITY_VELOCITY = -0.08;
+export const JUMP_VELOCITY = 0.42;
+export const GROUND_FRICTION = 0.91;
+export const AIR_FRICTION = 0.95;
 
 // VOXEL PLACEMENT
 export const BLOCK_DISTANCE = 5;
