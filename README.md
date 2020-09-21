@@ -14,6 +14,12 @@ A Minecraft-like voxel engine in the browser created using JavaScript and Three.
 - **Change blocks** using scroll wheel
 - **Enable debug** using F
 
+## Screenshots
+
+![Screenshot 1](https://i.imgur.com/gzcKKrX.png)
+![Screenshot 2](https://i.imgur.com/EXHOaSi.png)
+![Screenshot 3](https://i.imgur.com/LFe7ker.png)
+
 ## Disclaimer
 - This project is a WIP, many features are missing 
 - This project is not associated with Mojang or Minecraft
