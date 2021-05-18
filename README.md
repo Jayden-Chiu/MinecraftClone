@@ -3,7 +3,9 @@
 A Minecraft-like voxel engine in the browser created using JavaScript and Three.js.
 
 [Try the interactive demo here](https://jayden-chiu.github.io/MinecraftClone/.)
+
 **NOTE: Transparent blocks (water, leaves) do not render on macOS devices due to Three.js bug**
+
 (The page may take some time to load, be patient!)
 
 ## Controls
