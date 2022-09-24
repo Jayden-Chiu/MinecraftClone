@@ -128,7 +128,8 @@ export default class ChunkMesher {
         );
         t_geometry.setAttribute("normal", new THREE.BufferAttribute(new Float32Array(t_normals), normalNumComponents));
         t_geometry.setAttribute("uv", new THREE.BufferAttribute(new Float32Array(t_uvs), uvNumComponents));
-        t_geometry.setIndex(t_indices);
+        const size = t_positions.length / 3;
+        t_geometry.setIndex(t_indices.filter(v => v < size));
 
         return { geometry, t_geometry };
     }
